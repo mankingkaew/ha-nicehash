@@ -12,11 +12,10 @@ import httpx
 import json
 import logging
 import re
-import sys
 from time import mktime
 import uuid
 
-from .const import MAX_TWO_BYTES, NICEHASH_API_URL
+from .const import MAX_TWO_BYTES, NICEHASH_API_URL, TIMEOUT
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -120,9 +119,9 @@ class NiceHashPublicClient:
         async with httpx.AsyncClient() as client:
             if body:
                 data = json.dumps(body)
-                response = await client.request(method, url, data=data)
+                response = await client.request(method, url, data=data, timeout=TIMEOUT)
             else:
-                response = await client.request(method, url)
+                response = await client.request(method, url, timeout=TIMEOUT)
 
             if response.status_code == 200:
                 return response.json()
@@ -160,9 +159,9 @@ class NiceHashPrivateClient:
 
     async def toggle_device(self, device_id, action, rig_id):
         query = ""
-        body = {"deviceId":device_id,
-                "action":action,
-                "rigId":rig_id}
+        body = {"deviceId": device_id,
+                "action": action,
+                "rigId": rig_id}
         return await self.request("POST", "/main/api/v2/mining/rigs/status2", query, body)
 
     async def request(self, method, path, query="", body=None):
@@ -198,9 +197,9 @@ class NiceHashPrivateClient:
             _LOGGER.debug(url)
 
             if data:
-                response = await client.request(method, url, data=data)
+                response = await client.request(method, url, data=data, timeout=TIMEOUT)
             else:
-                response = await client.request(method, url)
+                response = await client.request(method, url, timeout=TIMEOUT)
 
             if response.status_code == 200:
                 return response.json()

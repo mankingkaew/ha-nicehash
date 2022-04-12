@@ -25,7 +25,6 @@ ICON_POWER = "mdi:power-plug"
 SENSOR = "sensor"
 PLATFORMS = [SENSOR]
 
-
 # Configuration and options
 CONF_API_KEY = "api_key"
 CONF_API_SECRET = "api_secret"
@@ -80,3 +79,4 @@ DEVICE_RPM = "device-rpm"
 PAYOUT_USER = "USER"
 # Magic numbers
 MAX_TWO_BYTES = 65536
+TIMEOUT = 20
