@@ -17,6 +17,7 @@ from .const import (
     ICON_PULSE,
     ICON_THERMOMETER,
     ICON_SPEEDOMETER,
+    ICON_POWER,
     NICEHASH_ATTRIBUTION,
 )
 from .coordinators import MiningRigsDataUpdateCoordinator
@@ -156,7 +157,7 @@ class DeviceSpeedSensor(DeviceSensor):
         if device and len(device.speeds) > 0:
             algorithm = device.speeds[0]
             self._algorithm = algorithm.get("title")
-            self._speed = algorithm.get("speed")
+            self._speed = float(algorithm.get("speed"))
             self._speed_unit = algorithm.get("displaySuffix")
         else:
             self._algorithm = "Unknown"
@@ -287,6 +288,54 @@ class DeviceTemperatureSensor(DeviceSensor):
             "rig": self._rig_name,
         }
 
+class DeviceHotspotTemperatureSensor(DeviceSensor):
+    """
+    Displays hotspot temperature of a mining rig device
+    """
+
+    _temperature = 0
+
+    @property
+    def name(self):
+        """Sensor name"""
+        return f"{self._device_name} hotspot Temperature"
+
+    @property
+    def unique_id(self):
+        """Unique entity id"""
+        return f"{self._device_id}:hotspot_temperature"
+
+    @property
+    def state(self):
+        """Sensor state"""
+        device = self._get_device()
+        if device:
+            self._hotspot_temperature = device.hotspot_temperature
+        else:
+            self._hotspot_temperature = 0
+
+        return self._hotspot_temperature
+
+    @property
+    def icon(self):
+        """Sensor icon"""
+        return ICON_THERMOMETER
+
+    @property
+    def unit_of_measurement(self):
+        """Sensor unit of measurement"""
+        # Not Celsius because then HA might convert to Fahrenheit
+        return "C"
+
+    @property
+    def device_state_attributes(self):
+        """Sensor device state attributes"""
+        return {
+            ATTR_ATTRIBUTION: NICEHASH_ATTRIBUTION,
+            "hotspot_temperature": self._hotspot_temperature,
+            "rig": self._rig_name,
+        }
+
 
 class DeviceLoadSensor(DeviceSensor):
     """
@@ -378,6 +427,51 @@ class DeviceRPMSensor(DeviceSensor):
         return {
             ATTR_ATTRIBUTION: NICEHASH_ATTRIBUTION,
             "rpm": self._rpm,
+            "rig": self._rig_name,
+        }
+
+class DevicePowerSensor(DeviceSensor):
+    """
+    Displays power of a mining rig device
+    """
+
+    @property
+    def name(self):
+        """Sensor name"""
+        return f"{self._device_name} Power"
+
+    @property
+    def unique_id(self):
+        """Unique entity id"""
+        return f"{self._device_id}:power"
+
+    @property
+    def state(self):
+        """Sensor state"""
+        device = self._get_device()
+        if device:
+            self._power = device.power
+        else:
+            self._power = 0
+
+        return self._power
+
+    @property
+    def icon(self):
+        """Sensor icon"""
+        return ICON_POWER
+
+    @property
+    def unit_of_measurement(self):
+        """Sensor unit of measurement"""
+        return "W"
+
+    @property
+    def device_state_attributes(self):
+        """Sensor device state attributes"""
+        return {
+            ATTR_ATTRIBUTION: NICEHASH_ATTRIBUTION,
+            "power": self._power,
             "rig": self._rig_name,
         }
 
